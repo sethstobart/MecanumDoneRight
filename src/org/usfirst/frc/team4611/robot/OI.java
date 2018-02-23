@@ -11,15 +11,18 @@ import edu.wpi.first.wpilibj.buttons.Button;
  */
 
 public class OI {
-	public Joystick leftJoy;
-	public Joystick rightJoy;
+	public static Joystick leftJoy;
+	public static Joystick rightJoy;
+	//Joystick ports
+	static int leftJoyPort = 0; //Joystick can be found on this port. The ports aren't physical plugs
+	static int rightJoyPort = 1; //But rather decided from the drivers station by the drivers
 	
 	public OI (){
-		leftJoy = new Joystick(RobotMap.leftJoyPort); //The left joystick exists on this port in robot map
-		rightJoy = new Joystick(RobotMap.rightJoyPort); //The right joystick exists on this port in robot map
+		leftJoy = new Joystick(leftJoyPort); //The left joystick exists on this port in robot map
+		rightJoy = new Joystick(rightJoyPort); //The right joystick exists on this port in robot map
 	}
 	
-	public double filter(double raw) //We pass joystick values through the filter here and edit the raw value
+	public static double filter(double raw) //We pass joystick values through the filter here and edit the raw value
     {
         if (Math.abs(raw) < .15) {
             return 0; //If the value passed is less than 15% ignore it. This is reffered to as a deadzone
@@ -28,7 +31,7 @@ public class OI {
         }
     }
 	
-	public double strafeFilter(double raw) {
+	public static double strafeFilter(double raw) {
 		if (Math.abs(raw) < .15) {
             return 0; //If the value passed is less than 15% ignore it. This is reffered to as a deadzone
         } else {
@@ -36,7 +39,7 @@ public class OI {
         }
 	}	
 	
-	public double rotateFilter(double raw) {
+	public static double rotateFilter(double raw) {
 		if (Math.abs(raw) < .15) {
             return 0; //If the value passed is less than 15% ignore it. This is reffered to as a deadzone
         } else {

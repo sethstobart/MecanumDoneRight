@@ -1,7 +1,7 @@
 
 package org.usfirst.frc.team4611.robot;
 
-import org.usfirst.frc.team4611.robot.subsystems.MecanumDriveTrainTalon;
+import org.usfirst.frc.team4611.robot.subsystems.OzoneMecanumDriveTrainTalon;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
  */
 public class Robot extends IterativeRobot {
 
-	public static MecanumDriveTrainTalon tankDrive;
+	public static OzoneMecanumDriveTrainTalon driveTrain;
 	public static OI oi;
 
 	Command autonomousCommand;
@@ -33,7 +33,7 @@ public class Robot extends IterativeRobot {
 		RobotMap.init(); //Run the method "init" in RobotMap
 		
 		//Initialize the subsystems
-		tankDrive = new MecanumDriveTrainTalon();
+		driveTrain = new OzoneMecanumDriveTrainTalon();
 		oi = new OI();
 	}
 
