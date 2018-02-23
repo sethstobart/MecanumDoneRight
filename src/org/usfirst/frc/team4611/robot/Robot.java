@@ -1,10 +1,13 @@
 
 package org.usfirst.frc.team4611.robot;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
+import org.usfirst.frc.team4611.robot.subsystems.IOzoneSubsystem;
 import org.usfirst.frc.team4611.robot.subsystems.MissingWiringInstructionException;
 import org.usfirst.frc.team4611.robot.subsystems.OzoneMecanumDriveTrainTalon;
+import org.usfirst.frc.team4611.robot.subsystems.SubsystemFactory;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
@@ -21,8 +24,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
  */
 public class Robot extends IterativeRobot {
 
-	public OzoneMecanumDriveTrainTalon driveTrain;
+	public IOzoneSubsystem driveTrain;
 	public OI oi;
+	SubsystemFactory	factory	= new SubsystemFactory();
 
 	Command autonomousCommand;
 	SendableChooser<Command> chooser = new SendableChooser<>();
@@ -39,13 +43,22 @@ public class Robot extends IterativeRobot {
 		
 		wireMap.put("OzoneMecanumDriveTrainTalon.backLeftMotor", new Integer(10));
 		//Initialize the subsystems
-		driveTrain = new OzoneMecanumDriveTrainTalon();
 		try {
+			// driveTrain = (IOzoneSubsystem) Class.forName("org.usfirst.frc.team4611.robot.subsystems.OzoneMecanumDriveTrainTalon").getConstructor().newInstance();
+			
+			driveTrain	= factory.createDriveTrain();
+
 			driveTrain.wire(wireMap);
 			
 			oi = new OI();
 		} catch (MissingWiringInstructionException wireException) {
 			wireException.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
