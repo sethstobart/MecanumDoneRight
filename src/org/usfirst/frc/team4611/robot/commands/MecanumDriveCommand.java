@@ -4,13 +4,14 @@ import org.usfirst.frc.team4611.robot.OI;
 import org.usfirst.frc.team4611.robot.subsystems.OzoneMecanumDriveTrainTalon;
 
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class MecanumDriveCommand extends Command {
 	
-	OzoneMecanumDriveTrainTalon	driveTrain	= null;
+	Subsystem driveTrain = null;
 	
-	public MecanumDriveCommand(OzoneMecanumDriveTrainTalon _ozoneMecanumDriveTrainTalon){
-		driveTrain	= _ozoneMecanumDriveTrainTalon;
+	public MecanumDriveCommand(Subsystem _ozoneMecanumDriveTrain){
+		driveTrain	= _ozoneMecanumDriveTrain;
 		this.requires(driveTrain);
 	}
 	
@@ -18,7 +19,7 @@ public class MecanumDriveCommand extends Command {
 		double y = OI.filter(OI.rightJoy.getX());
 		double x = OI.filter(OI.leftJoy.getX());
 		double z = OI.filter(OI.leftJoy.getY());
-	    driveTrain.move(y, x , z);
+	    ((OzoneMecanumDriveTrainTalon) driveTrain).move(y, x, z);
 	  }
 	
 	@Override

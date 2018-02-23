@@ -2,22 +2,20 @@ package org.usfirst.frc.team4611.robot.subsystems;
 
 public class SubsystemFactory {
 
-		
-		private boolean useTalon1 = true;
-		
 
 		public SubsystemFactory() {
 		}
 		
-		public IOzoneSubsystem createDriveTrain() {
+		public IOzoneSubsystem createDriveTrain(String speedController) {
 			
 			// if we have Talons
-			if (useTalon1)
+			if (speedController.equals("talon"))
 				return new OzoneMecanumDriveTrainTalon();
+			if (speedController.equals("victor")) 
+				return new OzoneMecanumDriveTrainVictor();
 			else {
-				return new OzoneMecanumDriveTrainTalon2();
-		
-		}
+				return new OzoneMecanumDriveTrainVictor(); // I realize it repeats but I dont know what the third case should be
+			}
 	}
 
 }

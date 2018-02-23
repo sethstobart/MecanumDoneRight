@@ -300,15 +300,18 @@ public void move(double y, double x, double z) { //Grabs the left and right valu
 		 * throw an exception if my needs are not in there
 		 */
 		Integer blPort	= (Integer) wireMap.get(this.getClass().getName() + "." + "backLeftMotor");
+		Integer brPort	= (Integer) wireMap.get(this.getClass().getName() + "." + "backrightMotor");
+		Integer flPort	= (Integer) wireMap.get(this.getClass().getName() + "." + "frontLeftMotor");
+		Integer frPort	= (Integer) wireMap.get(this.getClass().getName() + "." + "frontLeftMotor");
 		
-		if (blPort == null) {
+		if (blPort == null || brPort == null || flPort == null || frPort == null) {
 			throw new MissingWiringInstructionException("No port provided for " + this.getClass().getName() + "." + "backLeftMotor");
 		}
 
-		driveTrainFL_Talon = new WPI_TalonSRX(12);
-		driveTrainFR_Talon = new WPI_TalonSRX(13);
+		driveTrainFL_Talon = new WPI_TalonSRX(flPort.intValue());
+		driveTrainFR_Talon = new WPI_TalonSRX(frPort.intValue());
 		driveTrainBL_Talon = new WPI_TalonSRX(blPort.intValue());
-		driveTrainBR_Talon = new WPI_TalonSRX(11);
+		driveTrainBR_Talon = new WPI_TalonSRX(brPort.intValue());
 		
 	}
 }
