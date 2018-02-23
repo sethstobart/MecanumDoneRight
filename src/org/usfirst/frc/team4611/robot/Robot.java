@@ -18,8 +18,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
  */
 public class Robot extends IterativeRobot {
 
-	public static OzoneMecanumDriveTrainTalon driveTrain;
-	public static OI oi;
+	public OzoneMecanumDriveTrainTalon driveTrain;
+	public OI oi;
 
 	Command autonomousCommand;
 	SendableChooser<Command> chooser = new SendableChooser<>();
