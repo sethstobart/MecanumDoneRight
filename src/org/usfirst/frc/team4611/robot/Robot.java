@@ -1,6 +1,9 @@
 
 package org.usfirst.frc.team4611.robot;
 
+import java.util.HashMap;
+
+import org.usfirst.frc.team4611.robot.subsystems.MissingWiringInstructionException;
 import org.usfirst.frc.team4611.robot.subsystems.OzoneMecanumDriveTrainTalon;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -23,6 +26,8 @@ public class Robot extends IterativeRobot {
 
 	Command autonomousCommand;
 	SendableChooser<Command> chooser = new SendableChooser<>();
+	
+	HashMap<String, Object> wireMap	= new HashMap<String, Object> ();
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -32,9 +37,16 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		RobotMap.init(); //Run the method "init" in RobotMap
 		
+		wireMap.put("OzoneMecanumDriveTrainTalon.backLeftMotor", new Integer(10));
 		//Initialize the subsystems
 		driveTrain = new OzoneMecanumDriveTrainTalon();
-		oi = new OI();
+		try {
+			driveTrain.wire(wireMap);
+			
+			oi = new OI();
+		} catch (MissingWiringInstructionException wireException) {
+			wireException.printStackTrace();
+		}
 	}
 
 	/**

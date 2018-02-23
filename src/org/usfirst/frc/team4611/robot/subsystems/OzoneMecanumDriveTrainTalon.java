@@ -1,6 +1,8 @@
 package org.usfirst.frc.team4611.robot.subsystems;
 
 
+import java.util.Map;
+
 import org.usfirst.frc.team4611.robot.commands.MecanumDriveCommand;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -63,7 +65,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * {@link edu.wpi.first.wpilibj.RobotDrive#mecanumDrive_Polar(double, double, double)} if a
  * deadband of 0 is used.
  */
-public class OzoneMecanumDriveTrainTalon extends Subsystem {
+public class OzoneMecanumDriveTrainTalon extends Subsystem implements IOzoneSubsystem{
 
   	// motors
   	private  WPI_TalonSRX driveTrainFL_Talon;
@@ -75,10 +77,9 @@ public class OzoneMecanumDriveTrainTalon extends Subsystem {
 	int velocityInvert2 = -1;
 	int velocityInvert3 = -1;
 	int velocityInvert4 = 1;
+	
+	private boolean m_reported = false;
   
-
-  private boolean m_reported = false;
-
   /**
    * Construct a MecanumDrive.
    *
@@ -94,10 +95,6 @@ public class OzoneMecanumDriveTrainTalon extends Subsystem {
     addChild(m_rearRightMotor);
     */
 
-		driveTrainFL_Talon = new WPI_TalonSRX(12);
-		driveTrainFR_Talon = new WPI_TalonSRX(13);
-		driveTrainBL_Talon = new WPI_TalonSRX(10);
-		driveTrainBR_Talon = new WPI_TalonSRX(11);
   }
   
 
@@ -291,5 +288,27 @@ public void move(double y, double x, double z) { //Grabs the left and right valu
 	@Override
 	protected void initDefaultCommand() {
 		setDefaultCommand(new MecanumDriveCommand(this));
+	}
+
+
+
+	@Override
+	public void wire(Map<String, Object> wireMap) throws MissingWiringInstructionException {
+		
+		/**
+		 * get ports for stuff out of wireMap
+		 * throw an exception if my needs are not in there
+		 */
+		Integer blPort	= (Integer) wireMap.get(this.getClass().getName() + "." + "backLeftMotor");
+		
+		if (blPort == null) {
+			throw new MissingWiringInstructionException("No port provided for " + this.getClass().getName() + "." + "backLeftMotor");
+		}
+
+		driveTrainFL_Talon = new WPI_TalonSRX(12);
+		driveTrainFR_Talon = new WPI_TalonSRX(13);
+		driveTrainBL_Talon = new WPI_TalonSRX(blPort.intValue());
+		driveTrainBR_Talon = new WPI_TalonSRX(11);
+		
 	}
 }
