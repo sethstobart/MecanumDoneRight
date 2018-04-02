@@ -24,7 +24,7 @@ public class Robot extends IterativeRobot {
 
 	public IOzoneSubsystem driveTrain;
 	public OI oi;
-	SubsystemFactory	factory	= new SubsystemFactory();
+	SubsystemFactory factory = new SubsystemFactory();
 
 	Command autonomousCommand;
 	SendableChooser<Command> chooser = new SendableChooser<>();
@@ -48,7 +48,7 @@ public class Robot extends IterativeRobot {
 		//Initialize the subsystems
 		
 		try {
-			driveTrain	= factory.createDriveTrain("talon");
+			driveTrain = factory.createDriveTrain("talon");
 			driveTrain.wire(wireMap);
 		} catch (MissingWiringInstructionException wireException) {
 			wireException.printStackTrace();

@@ -20,6 +20,7 @@ public class MecanumDriveCommand extends Command {
 		double x = OI.filter(OI.leftJoy.getX());
 		double z = OI.filter(OI.leftJoy.getY());
 	    ((OzoneMecanumDriveTrainTalon) driveTrain).move(y, x, z);
+	    //((OzoneMecanumDriveTrainVictor driveTrain))
 	  }
 	
 	@Override

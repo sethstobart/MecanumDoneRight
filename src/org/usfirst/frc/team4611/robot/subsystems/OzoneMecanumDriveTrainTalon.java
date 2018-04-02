@@ -65,7 +65,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * {@link edu.wpi.first.wpilibj.RobotDrive#mecanumDrive_Polar(double, double, double)} if a
  * deadband of 0 is used.
  */
-public class OzoneMecanumDriveTrainTalon extends Subsystem implements IOzoneSubsystem{
+public class OzoneMecanumDriveTrainTalon extends Subsystem implements IOzoneSubsystem {
 
   	// motors
   	private  WPI_TalonSRX driveTrainFL_Talon;
@@ -305,7 +305,7 @@ public void move(double y, double x, double z) { //Grabs the left and right valu
 		Integer frPort	= (Integer) wireMap.get(this.getClass().getName() + "." + "frontLeftMotor");
 		
 		if (blPort == null || brPort == null || flPort == null || frPort == null) {
-			throw new MissingWiringInstructionException("No port provided for " + this.getClass().getName() + "." + "backLeftMotor");
+			throw new MissingWiringInstructionException("No port provided for " + this.getClass().getName());
 		}
 
 		driveTrainFL_Talon = new WPI_TalonSRX(flPort.intValue());
