@@ -77,26 +77,7 @@ public class OzoneMecanumDriveTrainTalon extends Subsystem implements IOzoneSubs
 		driveTrainFR_Talon = new WPI_TalonSRX(frPort.intValue());
 		driveTrainBL_Talon = new WPI_TalonSRX(blPort.intValue());
 		driveTrainBR_Talon = new WPI_TalonSRX(brPort.intValue());
-		
-		driveTrainFL_Talon.setInverted(false);
-		driveTrainBL_Talon.setInverted(false);
-		driveTrainBR_Talon.setInverted(true);
-		driveTrainFR_Talon.setInverted(true);
-		
-		driveTrainFL_Talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
-		driveTrainFR_Talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
-		driveTrainBL_Talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
-		driveTrainBR_Talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
-		
-		config_kP(.65);
-		config_kI(0);
-		config_kD(0);
-		
-		driveTrainFL_Talon.setSensorPhase(true);
-		driveTrainFR_Talon.setSensorPhase(true);
-		driveTrainBL_Talon.setSensorPhase(true);
-		driveTrainBR_Talon.setSensorPhase(true);
-		
+				
 		mecanumDriveTrain = new MecanumDrive(driveTrainFL_Talon, driveTrainBL_Talon, driveTrainFR_Talon, driveTrainBR_Talon);	
 	}
 
@@ -263,6 +244,27 @@ public class OzoneMecanumDriveTrainTalon extends Subsystem implements IOzoneSubs
 			else {
 				return false;
 			}
+		}
+		
+		public void resetTalonDriveTrain() {
+			driveTrainFL_Talon.setInverted(false);
+			driveTrainBL_Talon.setInverted(false);
+			driveTrainBR_Talon.setInverted(true);
+			driveTrainFR_Talon.setInverted(true);
+			
+			driveTrainFL_Talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
+			driveTrainFR_Talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
+			driveTrainBL_Talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
+			driveTrainBR_Talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
+			
+			config_kP(.65);
+			config_kI(0);
+			config_kD(0);
+			
+			driveTrainFL_Talon.setSensorPhase(true);
+			driveTrainFR_Talon.setSensorPhase(true);
+			driveTrainBL_Talon.setSensorPhase(true);
+			driveTrainBR_Talon.setSensorPhase(true);
 		}
 		
 		@Override
