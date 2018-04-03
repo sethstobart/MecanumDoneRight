@@ -29,7 +29,7 @@ public class Robot extends IterativeRobot {
 	Command autonomousCommand;
 	SendableChooser<Command> chooser = new SendableChooser<>();
 	
-	HashMap<String, Object> wireMap	= new HashMap<String, Object> ();
+	HashMap<String, Object> wireMap	= new HashMap<String, Object>();
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -37,14 +37,15 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void robotInit() {
-		wireMap.put("OzoneMecanumDriveTrainTalon.backLeftMotor", new Integer(10));
-		wireMap.put("OzoneMecanumDriveTrainTalon.backRightMotor", new Integer(11));
-		wireMap.put("OzoneMecanumDriveTrainTalon.frontLeftMotor", new Integer(12));
-		wireMap.put("OzoneMecanumDriveTrainTalon.frontRightMotor", new Integer(13));
-		wireMap.put("OzoneMecanumDriveTrainVictor.backLeftMotor", new Integer(0));
-		wireMap.put("OzoneMecanumDriveTrainVictor.frontLeftMotor", new Integer(1));
-		wireMap.put("OzoneMecanumDriveTrainVictor.backRightMotor", new Integer(2));
-		wireMap.put("OzoneMecanumDriveTrainVictor.backLeftMotor", new Integer(3));
+		String head = "org.usfirst.frc.team4611.robot.subsystems.";
+		wireMap.put(head + "OzoneMecanumDriveTrainTalon.backLeftMotor", new Integer(10)); //stores 10
+		wireMap.put(head + "OzoneMecanumDriveTrainTalon.backRightMotor", new Integer(11));
+		wireMap.put(head + "OzoneMecanumDriveTrainTalon.frontLeftMotor", new Integer(12));
+		wireMap.put(head + "OzoneMecanumDriveTrainTalon.frontRightMotor", new Integer(13));
+		wireMap.put(head + "OzoneMecanumDriveTrainVictor.backLeftMotor", new Integer(0));
+		wireMap.put(head + "OzoneMecanumDriveTrainVictor.frontLeftMotor", new Integer(1));
+		wireMap.put(head + "OzoneMecanumDriveTrainVictor.backRightMotor", new Integer(2));
+		wireMap.put(head + "OzoneMecanumDriveTrainVictor.backLeftMotor", new Integer(3));
 		//Initialize the subsystems
 		
 		try {

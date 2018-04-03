@@ -1,6 +1,7 @@
 package org.usfirst.frc.team4611.robot.commands;
 
 import org.usfirst.frc.team4611.robot.OI;
+import org.usfirst.frc.team4611.robot.Robot;
 import org.usfirst.frc.team4611.robot.subsystems.OzoneMecanumDriveTrainTalon;
 
 import edu.wpi.first.wpilibj.command.Command;
@@ -16,10 +17,15 @@ public class MecanumDriveCommand extends Command {
 	}
 	
 	protected void execute() { 
-		double y = OI.filter(OI.rightJoy.getX());
-		double x = OI.filter(OI.leftJoy.getX());
-		double z = OI.filter(OI.leftJoy.getY());
-	    ((OzoneMecanumDriveTrainTalon) driveTrain).move(y, x, z);
+		double YVal = -(OI.leftJoy.getY()); 
+		double XVal = (OI.leftJoy.getX());
+		double ZVal = (OI.rightJoy.getX());
+		double velocity1 = 4*(1200 * (YVal + XVal + ZVal));
+		double velocity2 = 4*(1200 * (YVal - XVal - ZVal));
+		double velocity3 = 4*(1200 * (YVal + XVal - ZVal));
+		double velocity4 = 4*(1200 * (YVal - XVal + ZVal));
+	    ((OzoneMecanumDriveTrainTalon) driveTrain).setRampRate(0);
+	    ((OzoneMecanumDriveTrainTalon) driveTrain).velocityDrive(velocity1, velocity2, velocity3, velocity4);
 	    //((OzoneMecanumDriveTrainVictor driveTrain))
 	  }
 	

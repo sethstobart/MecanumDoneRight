@@ -1,26 +1,16 @@
 package org.usfirst.frc.team4611.robot.subsystems;
 
-
 import java.util.Map;
 
 import org.usfirst.frc.team4611.robot.commands.MecanumDriveCommand;
+import org.usfirst.frc.team4611.robot.logging.Logger;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
-
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 /**
  * A class for driving Mecanum drive platforms.
@@ -66,232 +56,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * deadband of 0 is used.
  */
 public class OzoneMecanumDriveTrainTalon extends Subsystem implements IOzoneSubsystem {
-
-  	// motors
-  	private  WPI_TalonSRX driveTrainFL_Talon;
-	private  WPI_TalonSRX driveTrainFR_Talon;
-	private  WPI_TalonSRX driveTrainBL_Talon;
-	private  WPI_TalonSRX driveTrainBR_Talon;
 	
-	int velocityInvert1 = 1;
-	int velocityInvert2 = -1;
-	int velocityInvert3 = -1;
-	int velocityInvert4 = 1;
-	
-	private boolean m_reported = false;
-  
-  /**
-   * Construct a MecanumDrive.
-   *
-   * <p>If a motor needs to be inverted, do so before passing it in.
-   */
-  public OzoneMecanumDriveTrainTalon (){
-
-	/* **
-	 * this was refactored from WPI where Mecanum extended Sendable. the purpose was to get the motors in smart dashboard.
-    addChild(m_frontLeftMotor);
-    addChild(m_rearLeftMotor);
-    addChild(m_frontRightMotor);
-    addChild(m_rearRightMotor);
-    */
-
-  }
-  
-
-
-  /* (non-Javadoc)
- * @see org.usfirst.frc.team4611.subsystems.IOzoneMecanumDrive#driveCartesian(double, double, double, double)
- */
-  public void driveCartesian(double YVal, double XVal, double ZVal, double gyroAngle) {
-    if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 4,
-                 tInstances.kRobotDrive_MecanumCartesian);
-      m_reported = true;
-    }
-    
-	double velocity1;
-	double velocity2;
-	double velocity3;
-	double velocity4;
-	double YValScaler1 = 1;
-	double XValScaler1 = 1;
-	double YValScaler2 = 1;
-	double XValScaler2 = 1;
-	double ZValScaler = 1;
-	double	maxRPM	= 750;
-
-	
-	// Blaine and Halter's magic math
-	velocity1 = 4*(maxRPM * YVal * YValScaler1 + XVal * XValScaler1 + ZVal * ZValScaler) * (velocityInvert1);
-	velocity2 = 4*(maxRPM * YVal * YValScaler2 - XVal * XValScaler2 - ZVal * ZValScaler) * (velocityInvert2); 
-	velocity3 = 4*(maxRPM * YVal * YValScaler2 + XVal * XValScaler2 - ZVal * ZValScaler) * (velocityInvert3);
-	velocity4 = 4*(maxRPM * YVal * YValScaler1 - XVal * XValScaler1 + ZVal * ZValScaler) * (velocityInvert4);
-
-	setRampRate();
-	velocityDrive(velocity1, velocity2, velocity3, velocity4);    
-  }
-
-  
-  /* (non-Javadoc)
- * @see org.usfirst.frc.team4611.subsystems.IOzoneMecanumDrive#drivePolar(double, double, double)
- */
-  public void drivePolar(double magnitude, double angle, double zRotation) {
-    if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 4, tInstances.kRobotDrive_MecanumPolar);
-      m_reported = true;
-    }
-
-    driveCartesian(magnitude * Math.sin(angle * (Math.PI / 180.0)),
-                   magnitude * Math.cos(angle * (Math.PI / 180.0)), zRotation, 0.0);
-  }
-
-  /* (non-Javadoc)
- * @see org.usfirst.frc.team4611.subsystems.IOzoneMecanumDrive#stopMotor()
- */
-public void stopMotor() {
-    driveTrainFL_Talon.stopMotor();
-    driveTrainFR_Talon.stopMotor();
-    driveTrainBL_Talon.stopMotor();
-    driveTrainBR_Talon.stopMotor();
-  }
-
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("MecanumDrive");
-    builder.addDoubleProperty("Front Left Motor Speed", driveTrainFL_Talon::get,
-        driveTrainFL_Talon::set);
-    builder.addDoubleProperty("Front Right Motor Speed", () -> -driveTrainFR_Talon.get(),
-        value -> driveTrainFR_Talon.set(-value));
-    builder.addDoubleProperty("Rear Left Motor Speed", driveTrainBL_Talon::get,
-        driveTrainBL_Talon::set);
-    builder.addDoubleProperty("Rear Right Motor Speed", () -> -driveTrainBR_Talon.get(),
-        value -> driveTrainBR_Talon.set(-value));
-  }
-  
-  /* (non-Javadoc)
- * @see org.usfirst.frc.team4611.subsystems.IOzoneMecanumDrive#move(double, double, double)
- */
-public void move(double y, double x, double z) { //Grabs the left and right values that get passed by "TankDrive"
-		 driveCartesian(y, x, z, 0.0); //Use those values for the method "tankDrive" which calls for joystick values
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc.team4611.subsystems.IOzoneMecanumDrive#moveGyro(double, double, double, double)
-	 */
-	public void moveGyro (double y, double x, double z, double gyroAngle) {
-		driveCartesian(y, x, z, gyroAngle);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc.team4611.subsystems.IOzoneMecanumDrive#movePolar(double, double, double)
-	 */
-	public void movePolar (double mag, double angle, double z) {
-		drivePolar(mag, angle, z);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc.team4611.subsystems.IOzoneMecanumDrive#motionMagicStraight(int)
-	 */
-	public void motionMagicStraight(int positionUnits) {
-		driveTrainBL_Talon.set(ControlMode.MotionMagic, positionUnits);
-		driveTrainBR_Talon.set(ControlMode.MotionMagic, -positionUnits);
-		driveTrainFL_Talon.set(ControlMode.MotionMagic, positionUnits);
-		driveTrainFR_Talon.set(ControlMode.MotionMagic, -positionUnits);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc.team4611.subsystems.IOzoneMecanumDrive#motionMagicStrafe(int)
-	 */
-	public void motionMagicStrafe(int positionUnits) {
-		driveTrainBL_Talon.set(ControlMode.MotionMagic, -positionUnits);
-		driveTrainBR_Talon.set(ControlMode.MotionMagic, -positionUnits);
-		driveTrainFL_Talon.set(ControlMode.MotionMagic, positionUnits);
-		driveTrainFR_Talon.set(ControlMode.MotionMagic, positionUnits);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc.team4611.subsystems.IOzoneMecanumDrive#velocityDrive(double, double, double, double)
-	 */
-	public void velocityDrive(double velocity1, double velocity2, double velocity3, double velocity4) {
-		driveTrainBL_Talon.set(ControlMode.Velocity, velocity4);
-		driveTrainBR_Talon.set(ControlMode.Velocity, velocity3);
-		driveTrainFL_Talon.set(ControlMode.Velocity, velocity1);
-		driveTrainFR_Talon.set(ControlMode.Velocity, velocity2);
-		
-		String out = "";
-		
-
-		out += driveTrainBL_Talon.getSelectedSensorVelocity(0) + "," + velocity4+","+driveTrainBL_Talon.getMotorOutputPercent() + ",";
-		out += driveTrainBR_Talon.getSelectedSensorVelocity(0) + "," + velocity3+","+driveTrainBR_Talon.getMotorOutputPercent() + ",";
-		out += driveTrainFL_Talon.getSelectedSensorVelocity(0) + "," + velocity1+","+driveTrainFL_Talon.getMotorOutputPercent() + ",";
-		out += driveTrainFR_Talon.getSelectedSensorVelocity(0) + "," + velocity2+","+driveTrainFR_Talon.getMotorOutputPercent() + ",";
-		
-		System.out.println(out);
-		
-	}
-	//reset to 0 before every motion magic command
-		public void resetRampRate() {
-			driveTrainBL_Talon.configClosedloopRamp(0, 0);
-			driveTrainBR_Talon.configClosedloopRamp(0, 0);
-			driveTrainFL_Talon.configClosedloopRamp(0, 0);
-			driveTrainFR_Talon.configClosedloopRamp(0, 0);
-		}
-		//set back to default Ramp Rate
-		public void setRampRate() {
-			double rampSeconds = 0.5; //(double)getValue(mecanumSubTable, rampTime);
-			driveTrainBL_Talon.configClosedloopRamp(rampSeconds, 0);
-			driveTrainBR_Talon.configClosedloopRamp(rampSeconds, 0);
-			driveTrainFL_Talon.configClosedloopRamp(rampSeconds, 0);
-			driveTrainFR_Talon.configClosedloopRamp(rampSeconds, 0);
-		}
-		
-		public void rotate(double velocity) {
-			driveTrainBL_Talon.set(ControlMode.Velocity, velocity);
-			driveTrainBR_Talon.set(ControlMode.Velocity, velocity);
-			driveTrainFL_Talon.set(ControlMode.Velocity, velocity);
-			driveTrainFR_Talon.set(ControlMode.Velocity, velocity);
-
-		}
-		
-		public void logSpeed() {
-		  	double blSpeed, brSpeed, flSpeed, frSpeed;
-	    	
-	    	blSpeed	= driveTrainBL_Talon.get();
-	    	brSpeed	= driveTrainBR_Talon.get();
-	    	flSpeed	= driveTrainFL_Talon.get();
-	    	frSpeed	= driveTrainFR_Talon.get();
-
-	    	System.out.println(this.getClass().getName() + "isFinished() : motorSpeeds [bl, br, fl, fr] ["
-	    																			+ blSpeed + ", "
-	    																			+ brSpeed + ", "
-	    																			+ flSpeed + ", "
-	    																			+ frSpeed + ']');
-		}
-		
-		public void logPosition() {
-	    	double blPosition, brPosition, flPosition, frPosition;
-	    	
-	    	blPosition	= driveTrainBL_Talon.getSelectedSensorPosition(0);
-	    	brPosition	= driveTrainBR_Talon.getSelectedSensorPosition(0);
-	    	flPosition	= driveTrainFL_Talon.getSelectedSensorPosition(0);
-	    	frPosition	= driveTrainFR_Talon.getSelectedSensorPosition(0);
-	      	System.out.println(this.getClass().getName() + "isFinished() : motorPositions [bl, br, fl, fr] ["
-	      																			+ blPosition + ", "
-	      																			+ brPosition + ", "
-	      																			+ flPosition + ", "
-	      																			+ frPosition + ']');
-		}
-		
-
-
-	@Override
-	protected void initDefaultCommand() {
-		setDefaultCommand(new MecanumDriveCommand(this));
-	}
-
-
-
 	@Override
 	public void wire(Map<String, Object> wireMap) throws MissingWiringInstructionException {
 		
@@ -299,19 +64,209 @@ public void move(double y, double x, double z) { //Grabs the left and right valu
 		 * get ports for stuff out of wireMap
 		 * throw an exception if my needs are not in there
 		 */
-		Integer blPort	= (Integer) wireMap.get(this.getClass().getName() + "." + "backLeftMotor");
-		Integer brPort	= (Integer) wireMap.get(this.getClass().getName() + "." + "backrightMotor");
+		Integer blPort	= (Integer) wireMap.get(this.getClass().getName() + "." + "backLeftMotor"); //does return 10
+		Integer brPort	= (Integer) wireMap.get(this.getClass().getName() + "." + "backRightMotor");
 		Integer flPort	= (Integer) wireMap.get(this.getClass().getName() + "." + "frontLeftMotor");
-		Integer frPort	= (Integer) wireMap.get(this.getClass().getName() + "." + "frontLeftMotor");
+		Integer frPort	= (Integer) wireMap.get(this.getClass().getName() + "." + "frontRightMotor");
 		
 		if (blPort == null || brPort == null || flPort == null || frPort == null) {
 			throw new MissingWiringInstructionException("No port provided for " + this.getClass().getName());
 		}
-
+		
 		driveTrainFL_Talon = new WPI_TalonSRX(flPort.intValue());
 		driveTrainFR_Talon = new WPI_TalonSRX(frPort.intValue());
 		driveTrainBL_Talon = new WPI_TalonSRX(blPort.intValue());
 		driveTrainBR_Talon = new WPI_TalonSRX(brPort.intValue());
 		
+		driveTrainFL_Talon.setInverted(false);
+		driveTrainBL_Talon.setInverted(false);
+		driveTrainBR_Talon.setInverted(true);
+		driveTrainFR_Talon.setInverted(true);
+		
+		driveTrainFL_Talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
+		driveTrainFR_Talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
+		driveTrainBL_Talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
+		driveTrainBR_Talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
+		
+		config_kP(.65);
+		config_kI(0);
+		config_kD(0);
+		
+		driveTrainFL_Talon.setSensorPhase(true);
+		driveTrainFR_Talon.setSensorPhase(true);
+		driveTrainBL_Talon.setSensorPhase(true);
+		driveTrainBR_Talon.setSensorPhase(true);
+		
+		mecanumDriveTrain = new MecanumDrive(driveTrainFL_Talon, driveTrainBL_Talon, driveTrainFR_Talon, driveTrainBR_Talon);	
 	}
-}
+
+  	// motors
+  	private  WPI_TalonSRX driveTrainFL_Talon;
+	private  WPI_TalonSRX driveTrainFR_Talon;
+	private  WPI_TalonSRX driveTrainBL_Talon;
+	private  WPI_TalonSRX driveTrainBR_Talon;
+	private MecanumDrive mecanumDriveTrain;
+
+
+		public void move(double y, double x, double z) { 
+			 mecanumDriveTrain.driveCartesian(y, x, z); 
+		}
+		
+		public void moveGyro (double y, double x, double z, double gyroAngle) {
+			mecanumDriveTrain.driveCartesian(y, x, z, gyroAngle);
+		}
+		
+		public void movePolar (double mag, double angle, double z) {
+			mecanumDriveTrain.drivePolar(mag, angle, z);
+		}
+		
+		public void motionMagicStraight(double positionUnits) {
+			this.driveTrainBL_Talon.set(ControlMode.MotionMagic, positionUnits);
+			this.driveTrainBR_Talon.set(ControlMode.MotionMagic, -positionUnits);
+			this.driveTrainFL_Talon.set(ControlMode.MotionMagic, positionUnits);
+			this.driveTrainFR_Talon.set(ControlMode.MotionMagic, -positionUnits);
+		}
+		
+		public void motionMagicStrafe(double positionUnits) {
+			this.driveTrainFR_Talon.set(ControlMode.MotionMagic, positionUnits);
+			this.driveTrainBR_Talon.set(ControlMode.MotionMagic, -positionUnits);
+			this.driveTrainFL_Talon.set(ControlMode.MotionMagic, positionUnits);
+			this.driveTrainBL_Talon.set(ControlMode.MotionMagic, -positionUnits);
+		}
+		
+		public void resetEncoders() {
+			this.driveTrainBL_Talon.setSelectedSensorPosition(0, 0, 0);
+			this.driveTrainBR_Talon.setSelectedSensorPosition(0, 0, 0);
+			this.driveTrainFL_Talon.setSelectedSensorPosition(0, 0, 0);
+			this.driveTrainFR_Talon.setSelectedSensorPosition(0, 0, 0);
+		}
+		//reset to default 
+		public void velocityDrive(double velocity1, double velocity2, double velocity3, double velocity4) {
+			this.driveTrainBL_Talon.set(ControlMode.Velocity, velocity4);
+			this.driveTrainBR_Talon.set(ControlMode.Velocity, velocity3);
+			this.driveTrainFL_Talon.set(ControlMode.Velocity, velocity1);
+			this.driveTrainFR_Talon.set(ControlMode.Velocity, velocity2);		
+		}
+		//reset to 0 before every motion magic command
+		public void resetRampRate() {
+			this.driveTrainBL_Talon.configClosedloopRamp(0, 0);
+			this.driveTrainBR_Talon.configClosedloopRamp(0, 0);
+			this.driveTrainFL_Talon.configClosedloopRamp(0, 0);
+			this.driveTrainFR_Talon.configClosedloopRamp(0, 0);
+		}
+		//set back to default Ramp Rate
+		public void setRampRate(double rate) {
+			this.driveTrainBL_Talon.configClosedloopRamp(rate, 0);
+			this.driveTrainBR_Talon.configClosedloopRamp(rate, 0);
+			this.driveTrainFL_Talon.configClosedloopRamp(rate, 0);
+			this.driveTrainFR_Talon.configClosedloopRamp(rate, 0);
+		}
+		
+		public void rotate(double velocity) {
+			this.driveTrainBL_Talon.set(ControlMode.Velocity, velocity);
+			this.driveTrainBR_Talon.set(ControlMode.Velocity, velocity);
+			this.driveTrainFL_Talon.set(ControlMode.Velocity, velocity);
+			this.driveTrainFR_Talon.set(ControlMode.Velocity, velocity);
+
+		}
+		
+		public void config_kP(double p) {
+			this.driveTrainBL_Talon.config_kP(0, p, 0);
+			this.driveTrainBR_Talon.config_kP(0, p, 0);
+			this.driveTrainFL_Talon.config_kP(0, p, 0);
+			this.driveTrainFR_Talon.config_kP(0, p, 0);
+		}
+		
+		public void config_kI(double i) {
+			this.driveTrainBL_Talon.config_kI(0, i, 0);
+			this.driveTrainBR_Talon.config_kI(0, i, 0);
+			this.driveTrainFL_Talon.config_kI(0, i, 0);
+			this.driveTrainFR_Talon.config_kI(0, i, 0);
+		}
+		
+		public void config_kD(double d) {
+			this.driveTrainBL_Talon.config_kD(0, d, 0);
+			this.driveTrainBR_Talon.config_kD(0, d, 0);
+			this.driveTrainFL_Talon.config_kD(0, d, 0);
+			this.driveTrainFR_Talon.config_kD(0, d, 0);
+		}
+		
+		public void logSpeed() {
+		  	double blSpeed, brSpeed, flSpeed, frSpeed;
+	    	
+	    	blSpeed	= this.driveTrainBL_Talon.getMotorOutputPercent();
+	    	brSpeed	= this.driveTrainBR_Talon.getMotorOutputPercent();
+	    	flSpeed	= this.driveTrainFL_Talon.getMotorOutputPercent();
+	    	frSpeed	= this.driveTrainFR_Talon.getMotorOutputPercent();
+
+	    	Logger.log("motorSpeeds [bl, br, fl, fr] ["
+														+ blSpeed + ", "
+														+ brSpeed + ", "
+														+ flSpeed + ", "
+														+ frSpeed + ']', "DriveTrain");
+		}
+		
+		public void logPosition() {
+	    	double blPosition, brPosition, flPosition, frPosition;
+	    	
+	    	blPosition	= this.driveTrainBL_Talon.getSelectedSensorPosition(0);
+	    	brPosition	= this.driveTrainBR_Talon.getSelectedSensorPosition(0);
+	    	flPosition	= this.driveTrainFL_Talon.getSelectedSensorPosition(0);
+	    	frPosition	= this.driveTrainFR_Talon.getSelectedSensorPosition(0);
+	      	Logger.log("motorPositions [bl, br, fl, fr] ["
+														+ blPosition + ", "
+														+ brPosition + ", "
+														+ flPosition + ", "
+														+ frPosition + ']', "DriveTrain");
+		}
+		
+		public double getAveragePosition() {
+			double encoderPositionAverage = (Math.abs(this.driveTrainBL_Talon.getSelectedSensorPosition(0)) +
+			    	Math.abs(this.driveTrainBR_Talon.getSelectedSensorPosition(0)) +
+			       	Math.abs(this.driveTrainFL_Talon.getSelectedSensorPosition(0)) +
+			       	Math.abs(this.driveTrainFR_Talon.getSelectedSensorPosition(0))) / 4;
+			return encoderPositionAverage;
+		}
+		
+		public double getAverageSpeed() {
+			double encoderSpeedAverage = (Math.abs(this.driveTrainBL_Talon.getSelectedSensorVelocity(0)) +
+			    	Math.abs(this.driveTrainBR_Talon.getSelectedSensorVelocity(0)) +
+			       	Math.abs(this.driveTrainFL_Talon.getSelectedSensorVelocity(0)) +
+			       	Math.abs(this.driveTrainFR_Talon.getSelectedSensorVelocity(0))) / 4;
+			return encoderSpeedAverage;
+		}
+		
+		/**
+		   * Returns 0.0 if the given value is within the specified range around zero. The remaining range
+		   * between the deadband and 1.0 is scaled from 0.0 to 1.0. 
+		   *
+		   * @param value    value to clip
+		   * @param deadband range around zero
+		   */
+		protected double applyDeadband(double value, double deadband) {
+		    if (Math.abs(value) > deadband) {
+		      if (value > 0.0) {
+		        return (value - deadband) / (1.0 - deadband);
+		      } else {
+		        return (value + deadband) / (1.0 - deadband);
+		      }
+		    } else {
+		      return 0.0;
+		    }
+		}
+		
+		public boolean isTargetSpeedWithinThreshold(double speed){
+			if(Math.abs(speed) > 200) {
+				return true;
+			}
+			
+			else {
+				return false;
+			}
+		}
+		
+		@Override
+		protected void initDefaultCommand() {
+			setDefaultCommand(new MecanumDriveCommand(this));
+		}
+	}
