@@ -27,7 +27,7 @@ public class OzoneJavaLogger {
 			consoleHandler.setLevel(Level.SEVERE);
 			logger.addHandler(consoleHandler);
 			
-			Handler fileHandler = new FileHandler("/home/worthp/tmp/PlayLogger-%g",
+			Handler fileHandler = new FileHandler("PlayLogger-%g",
 					20*1024*1024,
 					10,
 					false);
