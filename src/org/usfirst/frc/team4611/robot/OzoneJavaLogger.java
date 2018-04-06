@@ -14,13 +14,29 @@ import java.util.logging.Logger;
 
 public class OzoneJavaLogger {
 	
-	private static  Logger logger	= Logger.getLogger("org.usfirst.frc.team4611.robot");
+	private static OzoneJavaLogger instance	= null;
+	private Logger logger	= Logger.getLogger("org.usfirst.frc.team4611.robot");
+	private boolean	initted	= false;
 
-	public OzoneJavaLogger() {
+	private OzoneJavaLogger() {
+		
+	}
+	
+	public static OzoneJavaLogger getInstance() {
+		if (instance == null) {
+			instance	= new OzoneJavaLogger();
+		}
+		return instance;
+	}
+
+	public void init(Level logLevel) {
+		if (initted)
+				return;
+		
 		logger.setUseParentHandlers(false);
-			
+		
 		try {
-			logger.setLevel(Level.INFO);
+			logger.setLevel(logLevel);
 			
 			Handler	consoleHandler	= new ConsoleHandler();
 			consoleHandler.setFormatter(new OzoneLogFormatter());
@@ -40,8 +56,11 @@ public class OzoneJavaLogger {
 			logger.log(Level.SEVERE, "XX", e);
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "XX", e);
+		} finally {
+			initted	= true;
 		}
 	}
+	
 	
 	public class OzoneLogFormatter extends Formatter {
 		StringBuffer	b	= new StringBuffer();
@@ -59,13 +78,30 @@ public class OzoneJavaLogger {
 			return b.toString();
 		}		
 	}
+	
+	public class LogTest {
+		final Logger	logger	= Logger.getLogger(LogTest.class.getName());
+		public LogTest() {
+			
+		}
+		
+		public void test() {
+			logger.info("LogTest info");
+			logger.fine("LogTest fine");
+		}
+	}
 
 	public static void main(String[] args) {
 		
-		OzoneJavaLogger config	= new OzoneJavaLogger();
-		Logger logger	= Logger.getLogger("org.usfirst.frc.team4611.robot");
-		logger.info("Something");
-		logger.severe("something else");
+		OzoneJavaLogger.getInstance().init(Level.FINE);
+		
+		Logger logger	= Logger.getLogger("org.usfirst.frc.team4611.robot.main");
+		logger.info("Information");
+		logger.severe("Severe");
+		LogTest logTest	=  OzoneJavaLogger.getInstance().new LogTest();
+		logTest.test();
+		
+		logger.finest("main finest");
 	}
 
 }
